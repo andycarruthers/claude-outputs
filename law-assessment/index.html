@@ -23,8 +23,8 @@
     /* ── Brand tokens ── */
     const NAVY   = "#2d4a6b";
     const BLUE   = "#1a7de8";
-    const BLUE_H = "#1565c0";  /* hover */
-    const LIGHT  = "#f0f4f8";  /* light bg sections */
+    const BLUE_H = "#1565c0";
+    const LIGHT  = "#f0f4f8";
     const BORDER = "#d0dce8";
     const TEXT   = "#1a2a3a";
     const MUTED  = "#5a7290";
@@ -273,12 +273,10 @@
       return MATURITY_LEVELS[4];
     }
 
-    /* ── Header ── */
     function Header() {
       return (
         <div style={{ background: NAVY, padding: "14px 32px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          <a href="https://hardbasket.com" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none" }}>
-            <span style={{ fontSize: 22 }}>🧺</span>
+          <a href="https://hardbasket.com" style={{ textDecoration: "none" }}>
             <span style={{ color: "#fff", fontWeight: 800, fontSize: 18, letterSpacing: "-0.02em" }}>HardBasket</span>
           </a>
           <a href="https://hardbasket.com" target="_blank" rel="noopener noreferrer"
@@ -289,7 +287,6 @@
       );
     }
 
-    /* ── Progress bar ── */
     function ProgressBar({ current, total }) {
       const pct = Math.round((current / total) * 100);
       return (
@@ -305,11 +302,9 @@
       );
     }
 
-    /* ── Intro screen ── */
     function Intro({ onStart }) {
       return (
         <div>
-          {/* Hero */}
           <div style={{ background: NAVY, padding: "72px 24px", textAlign: "center" }}>
             <div style={{ maxWidth: 640, margin: "0 auto" }}>
               <div style={{ display: "inline-block", background: "rgba(255,255,255,0.12)", borderRadius: 4, padding: "5px 14px", fontSize: 12, fontWeight: 600, letterSpacing: "0.08em", color: "#a8c8f0", marginBottom: 24, textTransform: "uppercase" }}>
@@ -338,8 +333,6 @@
               </div>
             </div>
           </div>
-
-          {/* Maturity ladder */}
           <div style={{ background: LIGHT, padding: "48px 24px" }}>
             <div style={{ maxWidth: 640, margin: "0 auto", textAlign: "center" }}>
               <p style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.1em", color: MUTED, textTransform: "uppercase", marginBottom: 20 }}>Five maturity levels</p>
@@ -356,7 +349,6 @@
       );
     }
 
-    /* ── Question section ── */
     function QuestionSection({ section, sectionIndex, totalSections, answers, onAnswer, onNext, onBack }) {
       const allAnswered = section.questions.every(q => answers[q.id] !== undefined);
       return (
@@ -366,7 +358,6 @@
             <span>{section.icon}</span>
             <span>{section.title}</span>
           </div>
-
           {section.questions.map((q, qi) => (
             <div key={q.id} style={{ marginBottom: 44 }}>
               <p style={{ fontSize: 17, fontWeight: 700, color: TEXT, lineHeight: 1.4, marginBottom: 16 }}>
@@ -393,7 +384,6 @@
               </div>
             </div>
           ))}
-
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", paddingTop: 24, borderTop: `1px solid ${BORDER}` }}>
             {sectionIndex > 0 ? (
               <button onClick={onBack} style={{ background: "transparent", border: `1px solid ${BORDER}`, borderRadius: 6, padding: "11px 22px", fontSize: 14, color: MUTED, cursor: "pointer", fontWeight: 500 }}>← Back</button>
@@ -412,11 +402,9 @@
       );
     }
 
-    /* ── Score gauge ── */
     function ScoreGauge({ score, maxScore, colour }) {
       const pct = (score / maxScore) * 100;
-      const radius = 80;
-      const circumference = Math.PI * radius;
+      const circumference = Math.PI * 80;
       const dashOffset = circumference - (pct / 100) * circumference;
       return (
         <div style={{ position: "relative", width: 200, height: 120, margin: "0 auto 8px" }}>
@@ -432,7 +420,6 @@
       );
     }
 
-    /* ── Section breakdown ── */
     function SectionBreakdown({ sections, answers }) {
       return (
         <div style={{ marginTop: 40 }}>
@@ -462,7 +449,6 @@
       );
     }
 
-    /* ── AI Insight ── */
     function AIInsight({ score, maxScore, level, sections, answers }) {
       const [insight, setInsight] = useState("");
       const [loading, setLoading] = useState(true);
@@ -512,13 +498,11 @@
       );
     }
 
-    /* ── Results screen ── */
     function Results({ score, maxScore, sections, answers, onRestart }) {
       const level = getMaturityLevel(score, maxScore);
       return (
         <div>
           <div style={{ maxWidth: 680, margin: "0 auto", padding: "40px 24px 64px" }}>
-            {/* Score card */}
             <div style={{ border: `3px solid ${level.colour}`, borderRadius: 10, padding: "36px 28px", marginBottom: 28, textAlign: "center", background: "#fff" }}>
               <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: MUTED, marginBottom: 16 }}>Your result</div>
               <ScoreGauge score={score} maxScore={maxScore} colour={level.colour} />
@@ -527,11 +511,7 @@
               </div>
               <p style={{ fontSize: 17, color: MUTED, fontStyle: "italic", lineHeight: 1.5 }}>&#8220;{level.tagline}&#8221;</p>
             </div>
-
-            {/* Description */}
             <p style={{ fontSize: 16, color: TEXT, lineHeight: 1.75, marginBottom: 28 }}>{level.description}</p>
-
-            {/* Priorities */}
             <div style={{ background: LIGHT, border: `1px solid ${BORDER}`, borderRadius: 8, padding: "24px", marginBottom: 8 }}>
               <h3 style={{ fontSize: 18, fontWeight: 700, color: TEXT, marginBottom: 16 }}>Where to focus next</h3>
               {level.priorities.map((p, i) => (
@@ -541,14 +521,8 @@
                 </div>
               ))}
             </div>
-
-            {/* AI insight */}
             <AIInsight score={score} maxScore={maxScore} level={level} sections={sections} answers={answers} />
-
-            {/* Section breakdown */}
             <SectionBreakdown sections={sections} answers={answers} />
-
-            {/* CTA */}
             <div style={{ marginTop: 48, background: NAVY, borderRadius: 10, padding: "40px 32px", textAlign: "center" }}>
               <h3 style={{ fontSize: 24, fontWeight: 800, color: "#fff", marginBottom: 12, letterSpacing: "-0.02em" }}>Want to know exactly what to fix first?</h3>
               <p style={{ fontSize: 16, color: "#a8c8f0", lineHeight: 1.65, marginBottom: 28, maxWidth: 480, margin: "0 auto 28px" }}>
@@ -567,7 +541,6 @@
       );
     }
 
-    /* ── App ── */
     function App() {
       const [stage, setStage] = useState("intro");
       const [currentSection, setCurrentSection] = useState(0);
