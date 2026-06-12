@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>How Automated Is Your Law Firm? | HardBasket</title>
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #fff; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="text/babel">
+    const { useState, useEffect, useRef } = React;
+
+    const SECTIONS = [
+      {
+        id: "intake",
+        title: "Client Intake & Onboarding",
+        icon: "📋",
+        questions: [
+          {
+            id: "q1",
+            text: "How do new clients submit their initial enquiry or matter details?",
+            options: [
+              { label: "Phone call or walk-in, notes taken by hand or memory", score: 0 },
+              { label: "Email, then we manually re-enter into our system", score: 1 },
+              { label: "Online form, but we still manually process the responses", score: 2 },
+              { label: "Online form connected directly to our matter management system", score: 3 },
+              { label: "Automated intake with ID verification, conflict check, and matter creation", score: 4 },
+            ],
+          },
+          {
+            id: "q2",
+            text: "How are engagement letters and client agreements produced?",
+            options: [
+              { label: "Written from scratch each time", score: 0 },
+              { label: "Copied from a previous matter and manually edited", score: 1 },
+              { label: "Template documents we fill in manually", score: 2 },
+              { label: "Auto-generated from matter data with a few clicks", score: 3 },
+              { label: "Automatically generated, sent for e-signature, and filed — no manual steps", score: 4 },
+            ],
+          },
+        ],
+      },
+      {
+        id: "documents",
+        title: "Document Management",
+        icon: "📁",
+        questions: [
+          {
+            id: "q3",
+            text: "Where do your client documents and matter files live?",
+            options: [
+              { label: "Physical files and folders", score: 0 },
+              { label: "Mix of email attachments, desktop folders, and shared drives", score: 1 },
+              { label: "A shared drive (Google Drive, SharePoint) with a folder structure", score: 2 },
+              { label: "Practice management software with document storage", score: 3 },
+              { label: "Fully integrated DMS with version control, templates, and automated filing", score: 4 },
+            ],
+          },
+          {
+            id: "q4",
+            text: "How do you handle document drafting (contracts, deeds, court documents)?",
+            options: [
+              { label: "Written from scratch each time by the lawyer", score: 0 },
+              { label: "Copy-paste from previous matters", score: 1 },
+              { label: "Word templates with manual variable substitution", score: 2 },
+              { label: "Template automation that pulls in client/matter data automatically", score: 3 },
+              { label: "AI-assisted drafting with automated population and review suggestions", score: 4 },
+            ],
+          },
+        ],
+      },
+      {
+        id: "time_billing",
+        title: "Time Recording & Billing",
+        icon: "⏱️",
+        questions: [
+          {
+            id: "q5",
+            text: "How do fee earners record their time?",
+            options: [
+              { label: "End-of-day memory or paper timesheets", score: 0 },
+              { label: "Spreadsheet or basic timer app", score: 1 },
+              { label: "Time recorded in practice management software, but manually", score: 2 },
+              { label: "Time captured in real-time via desktop or mobile app", score: 3 },
+              { label: "Automatic time capture from emails, documents, and calls with AI categorisation", score: 4 },
+            ],
+          },
+          {
+            id: "q6",
+            text: "How are invoices generated and sent?",
+            options: [
+              { label: "Manually written or typed each time", score: 0 },
+              { label: "Time entries compiled manually, invoice typed in Word", score: 1 },
+              { label: "Generated from practice management but requires significant review/editing", score: 2 },
+              { label: "One-click invoice generation from time entries, emailed automatically", score: 3 },
+              { label: "Fully automated billing cycle with payment follow-up and trust account reconciliation", score: 4 },
+            ],
+          },
+        ],
+      },
+      {
+        id: "communication",
+        title: "Client Communication",
+        icon: "💬",
+        questions: [
+          {
+            id: "q7",
+            text: "How do you keep clients updated on their matter progress?",
+            options: [
+              { label: "Only when they call us to ask", score: 0 },
+              { label: "Ad hoc emails when we remember", score: 1 },
+              { label: "Regular emails at key milestones, written manually each time", score: 2 },
+              { label: "Templated update emails triggered by matter status changes", score: 3 },
+              { label: "Automated updates with a client portal where they can view progress 24/7", score: 4 },
+            ],
+          },
+          {
+            id: "q8",
+            text: "How do you use AI tools in your day-to-day communication and writing?",
+            options: [
+              { label: "We don't use AI tools at all", score: 0 },
+              { label: "A few staff have tried ChatGPT personally but it's not firm-wide", score: 1 },
+              { label: "We use AI occasionally for drafting emails or summarising documents", score: 2 },
+              { label: "AI is a regular part of our workflow for writing, research, and drafting", score: 3 },
+              { label: "AI is embedded in our systems — it drafts, reviews, flags issues, and learns our style", score: 4 },
+            ],
+          },
+        ],
+      },
+      {
+        id: "compliance",
+        title: "Compliance & Risk",
+        icon: "🔒",
+        questions: [
+          {
+            id: "q9",
+            text: "How do you manage AML/CFT (anti-money laundering) due diligence?",
+            options: [
+              { label: "Manually — paper forms and photocopied IDs filed in matter folders", score: 0 },
+              { label: "Spreadsheet to track, documents stored in email or shared drive", score: 1 },
+              { label: "AML checklist process but still largely manual data entry", score: 2 },
+              { label: "AML software with digital ID verification integrated into onboarding", score: 3 },
+              { label: "Fully automated AML workflow with real-time risk scoring and audit trail", score: 4 },
+            ],
+          },
+          {
+            id: "q10",
+            text: "How do you manage deadlines, limitation dates, and critical reminders?",
+            options: [
+              { label: "Lawyer's personal diary or memory", score: 0 },
+              { label: "Shared calendar with manually entered dates", score: 1 },
+              { label: "Practice management diary with manual date entry", score: 2 },
+              { label: "Automated deadline creation based on matter type and jurisdiction rules", score: 3 },
+              { label: "Intelligent deadline management with escalation, conflict detection, and audit logs", score: 4 },
+            ],
+          },
+        ],
+      },
+      {
+        id: "reporting",
+        title: "Reporting & Business Intelligence",
+        icon: "📊",
+        questions: [
+          {
+            id: "q11",
+            text: "How do you track your firm's financial performance?",
+            options: [
+              { label: "Accountant provides figures quarterly or at year end", score: 0 },
+              { label: "Basic Xero/bank statements reviewed monthly", score: 1 },
+              { label: "Monthly reports from practice management, reviewed by principal", score: 2 },
+              { label: "Real-time dashboard showing WIP, billings, collections, and profitability", score: 3 },
+              { label: "Automated reporting with benchmarks, forecasts, and performance alerts", score: 4 },
+            ],
+          },
+          {
+            id: "q12",
+            text: "How do you measure team productivity and matter profitability?",
+            options: [
+              { label: "We don't measure this formally", score: 0 },
+              { label: "Rough sense based on billings vs salary costs", score: 1 },
+              { label: "We run reports occasionally but they take time to compile", score: 2 },
+              { label: "Regular reports showing utilisation, realisation, and matter profitability", score: 3 },
+              { label: "Automated dashboards that flag underperforming matters and team trends in real time", score: 4 },
+            ],
+          },
+        ],
+      },
+    ];
+
+    const MATURITY_LEVELS = [
+      {
+        range: [0, 20],
+        label: "Starting Point",
+        tagline: "Manual foundations — the good news is there's a lot of low-hanging fruit.",
+        colour: "#e74c3c",
+        description: "Your firm is running mostly on manual processes, email, and individual effort. That's not unusual — most NZ law firms in this bracket have been this way for years. The risk is that growth means hiring more people to do the same manual work. A few targeted automations could save 5–10 hours per week per person.",
+        priorities: [
+          "Start with client intake — an online form connected to your practice management system",
+          "Set up automated invoice generation from time entries",
+          "Implement digital AML/ID verification to remove paper from compliance",
+        ],
+      },
+      {
+        range: [21, 35],
+        label: "Getting Organised",
+        tagline: "You've got the basics in place — now it's time to connect them up.",
+        colour: "#e67e22",
+        description: "You're using software and have some templates in place, but the tools aren't talking to each other. Staff are still manually moving information between systems, re-entering data, and chasing approvals. The opportunity is integration — connecting what you already have so work flows automatically.",
+        priorities: [
+          "Connect your intake form to your practice management and billing system",
+          "Automate document generation from matter data (stop copy-pasting from old files)",
+          "Set up automated client update emails at matter milestones",
+        ],
+      },
+      {
+        range: [36, 44],
+        label: "Connected Practice",
+        tagline: "Your systems work — now make them work harder.",
+        colour: "#f1c40f",
+        description: "You've got solid foundations. Your practice management software is doing most of what it should, and some workflows are automated. The next step is adding AI to the parts that still require manual thinking — drafting, summarising, reviewing — and building dashboards that give you real visibility.",
+        priorities: [
+          "Introduce AI-assisted drafting for standard documents and correspondence",
+          "Build a real-time financial dashboard (WIP, billings, collections)",
+          "Add automated deadline management with escalation rules",
+        ],
+      },
+      {
+        range: [45, 52],
+        label: "Modern Firm",
+        tagline: "You're ahead of the curve — focus on compounding your advantage.",
+        colour: "#27ae60",
+        description: "Your firm is genuinely well-automated. Clients get a professional, joined-up experience. Staff aren't drowning in admin. You likely have more capacity than you're using. The opportunity now is using AI to handle more complex tasks — research, review, summarisation — and to build the kind of reporting that lets you make sharper business decisions.",
+        priorities: [
+          "Explore AI legal research and document review tools (VerifyWise, Spellbook, Harvey.ai)",
+          "Build per-matter profitability reporting tied to time recording",
+          "Develop a client self-service portal to reduce inbound queries",
+        ],
+      },
+      {
+        range: [53, 48],
+        label: "Leading Edge",
+        tagline: "You're running a genuinely modern firm. Share what's working.",
+        colour: "#2980b9",
+        description: "You're in a small minority of NZ law firms. Your systems are integrated, AI is embedded in your workflows, and you have real visibility into firm performance. The challenge now is staying current as AI capabilities evolve quickly, and making sure your team is using everything available to them.",
+        priorities: [
+          "Audit AI tool usage across the team — are people actually using what you've implemented?",
+          "Explore agentic AI workflows for routine legal tasks",
+          "Document and systematise your processes so they survive staff turnover",
+        ],
+      },
+    ];
+
+    function getMaturityLevel(score, maxScore) {
+      const pct = Math.round((score / maxScore) * 100);
+      if (pct <= 33) return MATURITY_LEVELS[0];
+      if (pct <= 54) return MATURITY_LEVELS[1];
+      if (pct <= 70) return MATURITY_LEVELS[2];
+      if (pct <= 87) return MATURITY_LEVELS[3];
+      return MATURITY_LEVELS[4];
+    }
+
+    function ProgressBar({ current, total }) {
+      const pct = Math.round((current / total) * 100);
+      return (
+        <div style={{ marginBottom: 32 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8, fontSize: 13, color: "#6b7280", fontFamily: "'DM Mono', monospace" }}>
+            <span>Section {current} of {total}</span>
+            <span>{pct}% complete</span>
+          </div>
+          <div style={{ height: 4, background: "#e5e7eb", borderRadius: 99 }}>
+            <div style={{ height: "100%", width: `${pct}%`, background: "linear-gradient(90deg, #c0392b, #e74c3c)", borderRadius: 99, transition: "width 0.5s ease" }} />
+          </div>
+        </div>
+      );
+    }
+
+    function Intro({ onStart }) {
+      return (
+        <div style={{ textAlign: "center", padding: "48px 24px" }}>
+          <div style={{ marginBottom: 40 }}>
+            <div style={{ display: "inline-flex", alignItems: "center", gap: 10, padding: "10px 20px", border: "2px solid #1a1a2e", borderRadius: 6, marginBottom: 48 }}>
+              <span style={{ fontSize: 20 }}>🧺</span>
+              <span style={{ fontFamily: "'Playfair Display', Georgia, serif", fontWeight: 700, fontSize: 18, letterSpacing: "-0.02em", color: "#1a1a2e" }}>HardBasket</span>
+            </div>
+          </div>
+          <div style={{ maxWidth: 620, margin: "0 auto" }}>
+            <div style={{ display: "inline-block", background: "#fef3c7", border: "1px solid #fbbf24", borderRadius: 4, padding: "6px 14px", fontSize: 12, fontFamily: "'DM Mono', monospace", fontWeight: 600, letterSpacing: "0.08em", color: "#92400e", marginBottom: 24, textTransform: "uppercase" }}>
+              NZ Law Firm Assessment
+            </div>
+            <h1 style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: "clamp(36px, 6vw, 56px)", fontWeight: 700, lineHeight: 1.1, color: "#1a1a2e", marginBottom: 20, letterSpacing: "-0.03em" }}>
+              How automated<br />
+              <span style={{ color: "#c0392b" }}>is your law firm?</span>
+            </h1>
+            <p style={{ fontSize: 18, color: "#4b5563", lineHeight: 1.7, marginBottom: 12, maxWidth: 520, margin: "0 auto 12px" }}>
+              Answer 12 questions across six practice areas. Get an honest maturity score — and a clear picture of where to focus first.
+            </p>
+            <p style={{ fontSize: 15, color: "#6b7280", marginBottom: 40 }}>Built for NZ law firms with 1–20 staff. Takes about 4 minutes.</p>
+            <div style={{ display: "flex", gap: 16, justifyContent: "center", alignItems: "center", flexWrap: "wrap", marginBottom: 48 }}>
+              {["Free report", "No signup required", "Specific to NZ practice"].map(f => (
+                <div key={f} style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 14, color: "#374151" }}>
+                  <span style={{ color: "#c0392b", fontSize: 16 }}>✓</span> {f}
+                </div>
+              ))}
+            </div>
+            <button
+              onClick={onStart}
+              style={{ background: "#1a1a2e", color: "#fff", border: "none", borderRadius: 6, padding: "16px 44px", fontSize: 16, fontWeight: 600, fontFamily: "'DM Sans', sans-serif", cursor: "pointer", letterSpacing: "-0.01em", transition: "background 0.2s" }}
+              onMouseEnter={e => e.target.style.background = "#c0392b"}
+              onMouseLeave={e => e.target.style.background = "#1a1a2e"}
+            >
+              Start the assessment →
+            </button>
+          </div>
+          <div style={{ marginTop: 72, maxWidth: 680, margin: "72px auto 0" }}>
+            <p style={{ fontSize: 12, fontFamily: "'DM Mono', monospace", letterSpacing: "0.08em", color: "#9ca3af", textTransform: "uppercase", marginBottom: 20 }}>Five maturity levels</p>
+            <div style={{ display: "flex", gap: 8, justifyContent: "center", flexWrap: "wrap" }}>
+              {["Starting Point", "Getting Organised", "Connected Practice", "Modern Firm", "Leading Edge"].map((l, i) => (
+                <div key={l} style={{ padding: "8px 14px", borderRadius: 4, border: "1px solid #e5e7eb", fontSize: 13, color: "#374151", background: "#fafafa" }}>
+                  <span style={{ color: "#9ca3af", marginRight: 6 }}>{i + 1}.</span>{l}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    function QuestionSection({ section, sectionIndex, totalSections, answers, onAnswer, onNext, onBack }) {
+      const allAnswered = section.questions.every(q => answers[q.id] !== undefined);
+      return (
+        <div style={{ maxWidth: 680, margin: "0 auto", padding: "0 24px" }}>
+          <ProgressBar current={sectionIndex + 1} total={totalSections} />
+          <div style={{ marginBottom: 40 }}>
+            <div style={{ display: "inline-flex", alignItems: "center", gap: 8, marginBottom: 12, padding: "6px 12px", background: "#f3f4f6", borderRadius: 4, fontSize: 13, color: "#374151", fontFamily: "'DM Mono', monospace" }}>
+              <span>{section.icon}</span>
+              <span>{section.title}</span>
+            </div>
+          </div>
+          {section.questions.map((q, qi) => (
+            <div key={q.id} style={{ marginBottom: 44 }}>
+              <p style={{ fontSize: 18, fontFamily: "'Playfair Display', Georgia, serif", fontWeight: 600, color: "#1a1a2e", lineHeight: 1.4, marginBottom: 18 }}>
+                {qi + 1}. {q.text}
+              </p>
+              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                {q.options.map((opt, oi) => {
+                  const selected = answers[q.id] === oi;
+                  return (
+                    <button
+                      key={oi}
+                      onClick={() => onAnswer(q.id, oi, opt.score)}
+                      style={{ textAlign: "left", padding: "14px 18px", border: selected ? "2px solid #c0392b" : "2px solid #e5e7eb", borderRadius: 8, background: selected ? "#fef2f2" : "#fff", cursor: "pointer", fontSize: 15, color: selected ? "#c0392b" : "#374151", fontWeight: selected ? 600 : 400, lineHeight: 1.4, transition: "all 0.15s", fontFamily: "'DM Sans', sans-serif", display: "flex", alignItems: "flex-start", gap: 12 }}
+                      onMouseEnter={e => { if (!selected) { e.currentTarget.style.borderColor = "#9ca3af"; e.currentTarget.style.background = "#f9fafb"; }}}
+                      onMouseLeave={e => { if (!selected) { e.currentTarget.style.borderColor = "#e5e7eb"; e.currentTarget.style.background = "#fff"; }}}
+                    >
+                      <span style={{ flexShrink: 0, width: 22, height: 22, borderRadius: "50%", border: selected ? "2px solid #c0392b" : "2px solid #d1d5db", background: selected ? "#c0392b" : "transparent", display: "inline-flex", alignItems: "center", justifyContent: "center", marginTop: 1 }}>
+                        {selected && <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#fff", display: "block" }} />}
+                      </span>
+                      {opt.label}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", paddingTop: 24, paddingBottom: 48, borderTop: "1px solid #f3f4f6" }}>
+            {sectionIndex > 0 ? (
+              <button onClick={onBack} style={{ background: "transparent", border: "1px solid #e5e7eb", borderRadius: 6, padding: "12px 24px", fontSize: 14, color: "#6b7280", cursor: "pointer", fontFamily: "'DM Sans', sans-serif" }}>← Back</button>
+            ) : <div />}
+            <button
+              onClick={onNext}
+              disabled={!allAnswered}
+              style={{ background: allAnswered ? "#1a1a2e" : "#e5e7eb", color: allAnswered ? "#fff" : "#9ca3af", border: "none", borderRadius: 6, padding: "12px 32px", fontSize: 15, fontWeight: 600, cursor: allAnswered ? "pointer" : "not-allowed", fontFamily: "'DM Sans', sans-serif", transition: "background 0.2s" }}
+              onMouseEnter={e => { if (allAnswered) e.target.style.background = "#c0392b"; }}
+              onMouseLeave={e => { if (allAnswered) e.target.style.background = "#1a1a2e"; }}
+            >
+              {sectionIndex === totalSections - 1 ? "See my results →" : "Next section →"}
+            </button>
+          </div>
+        </div>
+      );
+    }
+
+    function ScoreGauge({ score, maxScore }) {
+      const pct = (score / maxScore) * 100;
+      const radius = 80;
+      const circumference = Math.PI * radius;
+      const dashOffset = circumference - (pct / 100) * circumference;
+      return (
+        <div style={{ position: "relative", width: 200, height: 120, margin: "0 auto 8px" }}>
+          <svg width="200" height="120" viewBox="0 0 200 120">
+            <path d="M 20 100 A 80 80 0 0 1 180 100" fill="none" stroke="#e5e7eb" strokeWidth="14" strokeLinecap="round" />
+            <path d="M 20 100 A 80 80 0 0 1 180 100" fill="none" stroke="#c0392b" strokeWidth="14" strokeLinecap="round" strokeDasharray={circumference} strokeDashoffset={dashOffset} style={{ transition: "stroke-dashoffset 1.5s ease" }} />
+          </svg>
+          <div style={{ position: "absolute", bottom: 4, left: "50%", transform: "translateX(-50%)", textAlign: "center" }}>
+            <div style={{ fontSize: 40, fontWeight: 800, color: "#1a1a2e", fontFamily: "'Playfair Display', Georgia, serif", lineHeight: 1 }}>{score}</div>
+            <div style={{ fontSize: 13, color: "#9ca3af", fontFamily: "'DM Mono', monospace" }}>out of {maxScore}</div>
+          </div>
+        </div>
+      );
+    }
+
+    function SectionBreakdown({ sections, answers }) {
+      return (
+        <div style={{ marginTop: 40 }}>
+          <h3 style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: 22, fontWeight: 700, color: "#1a1a2e", marginBottom: 20 }}>Section breakdown</h3>
+          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+            {sections.map(s => {
+              const maxSectionScore = s.questions.length * 4;
+              const sectionScore = s.questions.reduce((acc, q) => {
+                const optIdx = answers[q.id];
+                if (optIdx === undefined) return acc;
+                return acc + q.options[optIdx].score;
+              }, 0);
+              const pct = Math.round((sectionScore / maxSectionScore) * 100);
+              return (
+                <div key={s.id} style={{ padding: "14px 18px", border: "1px solid #e5e7eb", borderRadius: 8, background: "#fafafa" }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8, alignItems: "center" }}>
+                    <span style={{ fontSize: 14, color: "#374151", fontWeight: 600 }}>{s.icon} {s.title}</span>
+                    <span style={{ fontSize: 13, fontFamily: "'DM Mono', monospace", color: "#6b7280" }}>{sectionScore}/{maxSectionScore}</span>
+                  </div>
+                  <div style={{ height: 6, background: "#e5e7eb", borderRadius: 99 }}>
+                    <div style={{ height: "100%", width: `${pct}%`, background: pct >= 70 ? "#27ae60" : pct >= 45 ? "#f1c40f" : "#e74c3c", borderRadius: 99, transition: "width 1s ease" }} />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      );
+    }
+
+    function AIInsight({ score, maxScore, level, sections, answers }) {
+      const [insight, setInsight] = useState("");
+      const [loading, setLoading] = useState(true);
+
+      useEffect(() => {
+        const pct = Math.round((score / maxScore) * 100);
+        const sectionSummary = sections.map(s => {
+          const sectionScore = s.questions.reduce((acc, q) => {
+            const optIdx = answers[q.id];
+            if (optIdx === undefined) return acc;
+            return acc + q.options[optIdx].score;
+          }, 0);
+          const maxSec = s.questions.length * 4;
+          return `${s.title}: ${sectionScore}/${maxSec}`;
+        }).join(", ");
+
+        const prompt = `You are a pragmatic NZ business automation consultant writing a brief personalised insight for a law firm that just completed an automation assessment.\n\nAssessment result: ${level.label} (${score}/${maxScore}, ${pct}%)\nSection scores: ${sectionSummary}\n\nWrite 3–4 sentences of honest, specific, practical commentary. Identify their weakest area and name one concrete first step. Do NOT use generic AI hype language. Do NOT use bullet points. Write in plain direct NZ English. Do not start with "Based on your results" or "Congratulations". Be direct and useful. Mention specific practice areas by name.`;
+
+        fetch("https://api.anthropic.com/v1/messages", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            model: "claude-sonnet-4-20250514",
+            max_tokens: 1000,
+            messages: [{ role: "user", content: prompt }],
+          }),
+        })
+          .then(r => r.json())
+          .then(data => {
+            const text = data.content?.find(b => b.type === "text")?.text || "";
+            setInsight(text);
+            setLoading(false);
+          })
+          .catch(() => {
+            setInsight("Your results highlight a clear path forward. Focus on connecting your existing tools before adding new ones — integration beats addition every time.");
+            setLoading(false);
+          });
+      }, []);
+
+      return (
+        <div style={{ background: "#1a1a2e", borderRadius: 10, padding: "28px 28px", marginTop: 32, position: "relative", overflow: "hidden" }}>
+          <div style={{ position: "absolute", top: -20, right: -20, fontSize: 80, opacity: 0.05 }}>🧠</div>
+          <div style={{ fontSize: 11, fontFamily: "'DM Mono', monospace", letterSpacing: "0.1em", color: "#9ca3af", textTransform: "uppercase", marginBottom: 12 }}>AI-generated insight</div>
+          {loading ? (
+            <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+              {[0, 1, 2].map(i => (
+                <div key={i} style={{ width: 8, height: 8, borderRadius: "50%", background: "#c0392b", animation: "pulse 1.2s ease-in-out infinite", animationDelay: `${i * 0.2}s` }} />
+              ))}
+              <style>{"@keyframes pulse { 0%,100%{opacity:0.3} 50%{opacity:1} }"}</style>
+            </div>
+          ) : (
+            <p style={{ fontSize: 16, color: "#e5e7eb", lineHeight: 1.7, fontFamily: "'DM Sans', sans-serif" }}>{insight}</p>
+          )}
+        </div>
+      );
+    }
+
+    function Results({ score, maxScore, sections, answers, onRestart }) {
+      const level = getMaturityLevel(score, maxScore);
+      return (
+        <div style={{ maxWidth: 680, margin: "0 auto", padding: "0 24px 64px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 40, paddingTop: 32 }}>
+            <span style={{ fontSize: 20 }}>🧺</span>
+            <span style={{ fontFamily: "'Playfair Display', Georgia, serif", fontWeight: 700, fontSize: 18, color: "#1a1a2e" }}>HardBasket</span>
+          </div>
+          <div style={{ border: `3px solid ${level.colour}`, borderRadius: 12, padding: "36px 32px", marginBottom: 32, textAlign: "center", background: "#fff" }}>
+            <div style={{ fontSize: 11, fontFamily: "'DM Mono', monospace", letterSpacing: "0.1em", textTransform: "uppercase", color: "#6b7280", marginBottom: 16 }}>Your result</div>
+            <ScoreGauge score={score} maxScore={maxScore} />
+            <div style={{ display: "inline-block", padding: "8px 20px", borderRadius: 99, background: level.colour, color: "#fff", fontWeight: 700, fontSize: 18, fontFamily: "'DM Sans', sans-serif", margin: "16px 0 10px" }}>{level.label}</div>
+            <p style={{ fontSize: 18, color: "#374151", fontStyle: "italic", fontFamily: "'Playfair Display', Georgia, serif" }}>&#8220;{level.tagline}&#8221;</p>
+          </div>
+          <div style={{ marginBottom: 32 }}>
+            <p style={{ fontSize: 16, color: "#4b5563", lineHeight: 1.75, fontFamily: "'DM Sans', sans-serif" }}>{level.description}</p>
+          </div>
+          <div style={{ background: "#f9fafb", border: "1px solid #e5e7eb", borderRadius: 10, padding: "24px 24px", marginBottom: 8 }}>
+            <h3 style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: 20, fontWeight: 700, color: "#1a1a2e", marginBottom: 16 }}>Where to focus next</h3>
+            {level.priorities.map((p, i) => (
+              <div key={i} style={{ display: "flex", gap: 12, alignItems: "flex-start", marginBottom: 14, paddingBottom: 14, borderBottom: i < level.priorities.length - 1 ? "1px solid #e5e7eb" : "none" }}>
+                <span style={{ flexShrink: 0, width: 24, height: 24, borderRadius: 4, background: "#c0392b", color: "#fff", display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 700, fontFamily: "'DM Mono', monospace" }}>{i + 1}</span>
+                <span style={{ fontSize: 15, color: "#374151", lineHeight: 1.5, fontFamily: "'DM Sans', sans-serif" }}>{p}</span>
+              </div>
+            ))}
+          </div>
+          <AIInsight score={score} maxScore={maxScore} level={level} sections={sections} answers={answers} />
+          <SectionBreakdown sections={sections} answers={answers} />
+          <div style={{ marginTop: 48, background: "#1a1a2e", borderRadius: 12, padding: "36px 32px", textAlign: "center" }}>
+            <h3 style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: 26, fontWeight: 700, color: "#fff", marginBottom: 12 }}>Want to know exactly what to fix first?</h3>
+            <p style={{ fontSize: 16, color: "#9ca3af", lineHeight: 1.6, marginBottom: 28 }}>HardBasket does a free 30-minute systems review for NZ law firms. We'll map your current tools, identify the three highest-value automation opportunities, and give you a plain-English plan — no pressure, no pitch deck.</p>
+            <a href="https://hardbasket.com" target="_blank" rel="noopener noreferrer" style={{ display: "inline-block", background: "#c0392b", color: "#fff", borderRadius: 6, padding: "14px 36px", fontSize: 15, fontWeight: 700, textDecoration: "none", fontFamily: "'DM Sans', sans-serif", letterSpacing: "-0.01em" }}>Book a free systems review →</a>
+            <div style={{ marginTop: 20 }}>
+              <button onClick={onRestart} style={{ background: "transparent", border: "none", color: "#6b7280", cursor: "pointer", fontSize: 13, fontFamily: "'DM Sans', sans-serif", textDecoration: "underline" }}>Retake assessment</button>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    function App() {
+      const [stage, setStage] = useState("intro");
+      const [currentSection, setCurrentSection] = useState(0);
+      const [answers, setAnswers] = useState({});
+      const [scores, setScores] = useState({});
+      const topRef = useRef(null);
+
+      const scrollTop = () => { if (topRef.current) topRef.current.scrollIntoView({ behavior: "smooth" }); };
+
+      const handleAnswer = (qId, optIdx, score) => {
+        setAnswers(prev => ({ ...prev, [qId]: optIdx }));
+        setScores(prev => ({ ...prev, [qId]: score }));
+      };
+
+      const handleNext = () => {
+        scrollTop();
+        if (currentSection < SECTIONS.length - 1) { setCurrentSection(c => c + 1); } else { setStage("results"); }
+      };
+
+      const handleBack = () => { scrollTop(); setCurrentSection(c => c - 1); };
+
+      const handleRestart = () => { setAnswers({}); setScores({}); setCurrentSection(0); setStage("intro"); scrollTop(); };
+
+      const totalScore = Object.values(scores).reduce((a, b) => a + b, 0);
+      const maxScore = SECTIONS.reduce((acc, s) => acc + s.questions.length * 4, 0);
+
+      return (
+        <div ref={topRef} style={{ minHeight: "100vh", background: "#ffffff", fontFamily: "'DM Sans', sans-serif" }}>
+          <style>{`@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@400;600;700&family=DM+Mono:wght@400;600&display=swap'); * { box-sizing: border-box; margin: 0; padding: 0; } button { font-family: inherit; }`}</style>
+          <div style={{ height: 4, background: "linear-gradient(90deg, #c0392b, #e74c3c, #f39c12)" }} />
+          {stage === "intro" && <Intro onStart={() => { setStage("question"); scrollTop(); }} />}
+          {stage === "question" && (
+            <div style={{ paddingTop: 40 }}>
+              <QuestionSection section={SECTIONS[currentSection]} sectionIndex={currentSection} totalSections={SECTIONS.length} answers={answers} onAnswer={handleAnswer} onNext={handleNext} onBack={handleBack} />
+            </div>
+          )}
+          {stage === "results" && <Results score={totalScore} maxScore={maxScore} sections={SECTIONS} answers={answers} onRestart={handleRestart} />}
+          <div style={{ borderTop: "1px solid #f3f4f6", padding: "20px 24px", textAlign: "center", fontSize: 13, color: "#9ca3af", fontFamily: "'DM Mono', monospace" }}>
+            <a href="https://hardbasket.com" target="_blank" rel="noopener noreferrer" style={{ color: "#9ca3af", textDecoration: "none" }}>hardbasket.com</a>
+            {" · "}Built for NZ law firms
+          </div>
+        </div>
+      );
+    }
+
+    const root = ReactDOM.createRoot(document.getElementById("root"));
+    root.render(<App />);
+  </script>
+</body>
+</html>
