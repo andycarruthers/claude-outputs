@@ -454,7 +454,7 @@
 
         const prompt = `You are a pragmatic NZ business automation consultant writing a brief personalised insight for a law firm that just completed an automation assessment.\n\nAssessment result: ${level.label} (${score}/${maxScore}, ${pct}%)\nSection scores: ${sectionSummary}\n\nWrite 3–4 sentences of honest, specific, practical commentary. Identify their weakest area and name one concrete first step. Do NOT use generic AI hype language. Do NOT use bullet points. Write in plain direct NZ English. Do not start with "Based on your results" or "Congratulations". Be direct and useful. Mention specific practice areas by name.`;
 
-        fetch("https://api.anthropic.com/v1/messages", {
+        fetch("/.netlify/functions/claude", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
