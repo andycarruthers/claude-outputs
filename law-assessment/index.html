@@ -4,18 +4,30 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>How Automated Is Your Law Firm? | HardBasket</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { background: #fff; }
+    body { background: #fff; font-family: 'Inter', sans-serif; }
+    button { font-family: inherit; }
   </style>
 </head>
 <body>
   <div id="root"></div>
   <script type="text/babel">
     const { useState, useEffect, useRef } = React;
+
+    /* ── Brand tokens ── */
+    const NAVY   = "#2d4a6b";
+    const BLUE   = "#1a7de8";
+    const BLUE_H = "#1565c0";  /* hover */
+    const LIGHT  = "#f0f4f8";  /* light bg sections */
+    const BORDER = "#d0dce8";
+    const TEXT   = "#1a2a3a";
+    const MUTED  = "#5a7290";
 
     const SECTIONS = [
       {
@@ -196,7 +208,6 @@
 
     const MATURITY_LEVELS = [
       {
-        range: [0, 20],
         label: "Starting Point",
         tagline: "Manual foundations — the good news is there's a lot of low-hanging fruit.",
         colour: "#e74c3c",
@@ -208,7 +219,6 @@
         ],
       },
       {
-        range: [21, 35],
         label: "Getting Organised",
         tagline: "You've got the basics in place — now it's time to connect them up.",
         colour: "#e67e22",
@@ -220,10 +230,9 @@
         ],
       },
       {
-        range: [36, 44],
         label: "Connected Practice",
         tagline: "Your systems work — now make them work harder.",
-        colour: "#f1c40f",
+        colour: "#d4ac0d",
         description: "You've got solid foundations. Your practice management software is doing most of what it should, and some workflows are automated. The next step is adding AI to the parts that still require manual thinking — drafting, summarising, reviewing — and building dashboards that give you real visibility.",
         priorities: [
           "Introduce AI-assisted drafting for standard documents and correspondence",
@@ -232,7 +241,6 @@
         ],
       },
       {
-        range: [45, 52],
         label: "Modern Firm",
         tagline: "You're ahead of the curve — focus on compounding your advantage.",
         colour: "#27ae60",
@@ -244,10 +252,9 @@
         ],
       },
       {
-        range: [53, 48],
         label: "Leading Edge",
         tagline: "You're running a genuinely modern firm. Share what's working.",
-        colour: "#2980b9",
+        colour: BLUE,
         description: "You're in a small minority of NZ law firms. Your systems are integrated, AI is embedded in your workflows, and you have real visibility into firm performance. The challenge now is staying current as AI capabilities evolve quickly, and making sure your team is using everything available to them.",
         priorities: [
           "Audit AI tool usage across the team — are people actually using what you've implemented?",
@@ -266,86 +273,103 @@
       return MATURITY_LEVELS[4];
     }
 
+    /* ── Header ── */
+    function Header() {
+      return (
+        <div style={{ background: NAVY, padding: "14px 32px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <a href="https://hardbasket.com" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none" }}>
+            <span style={{ fontSize: 22 }}>🧺</span>
+            <span style={{ color: "#fff", fontWeight: 800, fontSize: 18, letterSpacing: "-0.02em" }}>HardBasket</span>
+          </a>
+          <a href="https://hardbasket.com" target="_blank" rel="noopener noreferrer"
+            style={{ color: "#fff", fontSize: 13, fontWeight: 600, textDecoration: "none", opacity: 0.8 }}>
+            hardbasket.com
+          </a>
+        </div>
+      );
+    }
+
+    /* ── Progress bar ── */
     function ProgressBar({ current, total }) {
       const pct = Math.round((current / total) * 100);
       return (
         <div style={{ marginBottom: 32 }}>
-          <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8, fontSize: 13, color: "#6b7280", fontFamily: "'DM Mono', monospace" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8, fontSize: 13, color: MUTED }}>
             <span>Section {current} of {total}</span>
             <span>{pct}% complete</span>
           </div>
-          <div style={{ height: 4, background: "#e5e7eb", borderRadius: 99 }}>
-            <div style={{ height: "100%", width: `${pct}%`, background: "linear-gradient(90deg, #c0392b, #e74c3c)", borderRadius: 99, transition: "width 0.5s ease" }} />
+          <div style={{ height: 5, background: BORDER, borderRadius: 99 }}>
+            <div style={{ height: "100%", width: `${pct}%`, background: BLUE, borderRadius: 99, transition: "width 0.5s ease" }} />
           </div>
         </div>
       );
     }
 
+    /* ── Intro screen ── */
     function Intro({ onStart }) {
       return (
-        <div style={{ textAlign: "center", padding: "48px 24px" }}>
-          <div style={{ marginBottom: 40 }}>
-            <div style={{ display: "inline-flex", alignItems: "center", gap: 10, padding: "10px 20px", border: "2px solid #1a1a2e", borderRadius: 6, marginBottom: 48 }}>
-              <span style={{ fontSize: 20 }}>🧺</span>
-              <span style={{ fontFamily: "'Playfair Display', Georgia, serif", fontWeight: 700, fontSize: 18, letterSpacing: "-0.02em", color: "#1a1a2e" }}>HardBasket</span>
+        <div>
+          {/* Hero */}
+          <div style={{ background: NAVY, padding: "72px 24px", textAlign: "center" }}>
+            <div style={{ maxWidth: 640, margin: "0 auto" }}>
+              <div style={{ display: "inline-block", background: "rgba(255,255,255,0.12)", borderRadius: 4, padding: "5px 14px", fontSize: 12, fontWeight: 600, letterSpacing: "0.08em", color: "#a8c8f0", marginBottom: 24, textTransform: "uppercase" }}>
+                NZ Law Firm Assessment
+              </div>
+              <h1 style={{ fontSize: "clamp(32px, 5vw, 52px)", fontWeight: 800, lineHeight: 1.1, color: "#fff", marginBottom: 20, letterSpacing: "-0.03em" }}>
+                How automated<br />is your law firm?
+              </h1>
+              <p style={{ fontSize: 18, color: "#a8c8f0", lineHeight: 1.7, marginBottom: 36, maxWidth: 500, margin: "0 auto 36px" }}>
+                Answer 12 questions across six practice areas. Get an honest maturity score and a clear picture of where to focus first.
+              </p>
+              <button
+                onClick={onStart}
+                style={{ background: BLUE, color: "#fff", border: "none", borderRadius: 6, padding: "16px 44px", fontSize: 16, fontWeight: 700, cursor: "pointer", letterSpacing: "-0.01em", transition: "background 0.2s" }}
+                onMouseEnter={e => e.target.style.background = BLUE_H}
+                onMouseLeave={e => e.target.style.background = BLUE}
+              >
+                Start the assessment →
+              </button>
+              <div style={{ marginTop: 24, display: "flex", gap: 24, justifyContent: "center", flexWrap: "wrap" }}>
+                {["Free report", "No signup required", "Specific to NZ practice", "~4 minutes"].map(f => (
+                  <span key={f} style={{ fontSize: 13, color: "#a8c8f0", display: "flex", alignItems: "center", gap: 6 }}>
+                    <span style={{ color: BLUE, fontSize: 15 }}>✓</span> {f}
+                  </span>
+                ))}
+              </div>
             </div>
           </div>
-          <div style={{ maxWidth: 620, margin: "0 auto" }}>
-            <div style={{ display: "inline-block", background: "#fef3c7", border: "1px solid #fbbf24", borderRadius: 4, padding: "6px 14px", fontSize: 12, fontFamily: "'DM Mono', monospace", fontWeight: 600, letterSpacing: "0.08em", color: "#92400e", marginBottom: 24, textTransform: "uppercase" }}>
-              NZ Law Firm Assessment
-            </div>
-            <h1 style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: "clamp(36px, 6vw, 56px)", fontWeight: 700, lineHeight: 1.1, color: "#1a1a2e", marginBottom: 20, letterSpacing: "-0.03em" }}>
-              How automated<br />
-              <span style={{ color: "#c0392b" }}>is your law firm?</span>
-            </h1>
-            <p style={{ fontSize: 18, color: "#4b5563", lineHeight: 1.7, marginBottom: 12, maxWidth: 520, margin: "0 auto 12px" }}>
-              Answer 12 questions across six practice areas. Get an honest maturity score — and a clear picture of where to focus first.
-            </p>
-            <p style={{ fontSize: 15, color: "#6b7280", marginBottom: 40 }}>Built for NZ law firms with 1–20 staff. Takes about 4 minutes.</p>
-            <div style={{ display: "flex", gap: 16, justifyContent: "center", alignItems: "center", flexWrap: "wrap", marginBottom: 48 }}>
-              {["Free report", "No signup required", "Specific to NZ practice"].map(f => (
-                <div key={f} style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 14, color: "#374151" }}>
-                  <span style={{ color: "#c0392b", fontSize: 16 }}>✓</span> {f}
-                </div>
-              ))}
-            </div>
-            <button
-              onClick={onStart}
-              style={{ background: "#1a1a2e", color: "#fff", border: "none", borderRadius: 6, padding: "16px 44px", fontSize: 16, fontWeight: 600, fontFamily: "'DM Sans', sans-serif", cursor: "pointer", letterSpacing: "-0.01em", transition: "background 0.2s" }}
-              onMouseEnter={e => e.target.style.background = "#c0392b"}
-              onMouseLeave={e => e.target.style.background = "#1a1a2e"}
-            >
-              Start the assessment →
-            </button>
-          </div>
-          <div style={{ marginTop: 72, maxWidth: 680, margin: "72px auto 0" }}>
-            <p style={{ fontSize: 12, fontFamily: "'DM Mono', monospace", letterSpacing: "0.08em", color: "#9ca3af", textTransform: "uppercase", marginBottom: 20 }}>Five maturity levels</p>
-            <div style={{ display: "flex", gap: 8, justifyContent: "center", flexWrap: "wrap" }}>
-              {["Starting Point", "Getting Organised", "Connected Practice", "Modern Firm", "Leading Edge"].map((l, i) => (
-                <div key={l} style={{ padding: "8px 14px", borderRadius: 4, border: "1px solid #e5e7eb", fontSize: 13, color: "#374151", background: "#fafafa" }}>
-                  <span style={{ color: "#9ca3af", marginRight: 6 }}>{i + 1}.</span>{l}
-                </div>
-              ))}
+
+          {/* Maturity ladder */}
+          <div style={{ background: LIGHT, padding: "48px 24px" }}>
+            <div style={{ maxWidth: 640, margin: "0 auto", textAlign: "center" }}>
+              <p style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.1em", color: MUTED, textTransform: "uppercase", marginBottom: 20 }}>Five maturity levels</p>
+              <div style={{ display: "flex", gap: 8, justifyContent: "center", flexWrap: "wrap" }}>
+                {["Starting Point", "Getting Organised", "Connected Practice", "Modern Firm", "Leading Edge"].map((l, i) => (
+                  <div key={l} style={{ padding: "8px 16px", borderRadius: 4, border: `1px solid ${BORDER}`, fontSize: 13, color: TEXT, background: "#fff", fontWeight: 500 }}>
+                    <span style={{ color: MUTED, marginRight: 6 }}>{i + 1}.</span>{l}
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>
       );
     }
 
+    /* ── Question section ── */
     function QuestionSection({ section, sectionIndex, totalSections, answers, onAnswer, onNext, onBack }) {
       const allAnswered = section.questions.every(q => answers[q.id] !== undefined);
       return (
-        <div style={{ maxWidth: 680, margin: "0 auto", padding: "0 24px" }}>
+        <div style={{ maxWidth: 680, margin: "0 auto", padding: "40px 24px" }}>
           <ProgressBar current={sectionIndex + 1} total={totalSections} />
-          <div style={{ marginBottom: 40 }}>
-            <div style={{ display: "inline-flex", alignItems: "center", gap: 8, marginBottom: 12, padding: "6px 12px", background: "#f3f4f6", borderRadius: 4, fontSize: 13, color: "#374151", fontFamily: "'DM Mono', monospace" }}>
-              <span>{section.icon}</span>
-              <span>{section.title}</span>
-            </div>
+          <div style={{ display: "inline-flex", alignItems: "center", gap: 8, marginBottom: 32, padding: "6px 14px", background: NAVY, borderRadius: 4, fontSize: 13, color: "#fff", fontWeight: 600 }}>
+            <span>{section.icon}</span>
+            <span>{section.title}</span>
           </div>
+
           {section.questions.map((q, qi) => (
             <div key={q.id} style={{ marginBottom: 44 }}>
-              <p style={{ fontSize: 18, fontFamily: "'Playfair Display', Georgia, serif", fontWeight: 600, color: "#1a1a2e", lineHeight: 1.4, marginBottom: 18 }}>
+              <p style={{ fontSize: 17, fontWeight: 700, color: TEXT, lineHeight: 1.4, marginBottom: 16 }}>
                 {qi + 1}. {q.text}
               </p>
               <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
@@ -355,12 +379,12 @@
                     <button
                       key={oi}
                       onClick={() => onAnswer(q.id, oi, opt.score)}
-                      style={{ textAlign: "left", padding: "14px 18px", border: selected ? "2px solid #c0392b" : "2px solid #e5e7eb", borderRadius: 8, background: selected ? "#fef2f2" : "#fff", cursor: "pointer", fontSize: 15, color: selected ? "#c0392b" : "#374151", fontWeight: selected ? 600 : 400, lineHeight: 1.4, transition: "all 0.15s", fontFamily: "'DM Sans', sans-serif", display: "flex", alignItems: "flex-start", gap: 12 }}
-                      onMouseEnter={e => { if (!selected) { e.currentTarget.style.borderColor = "#9ca3af"; e.currentTarget.style.background = "#f9fafb"; }}}
-                      onMouseLeave={e => { if (!selected) { e.currentTarget.style.borderColor = "#e5e7eb"; e.currentTarget.style.background = "#fff"; }}}
+                      style={{ textAlign: "left", padding: "13px 16px", border: selected ? `2px solid ${BLUE}` : `2px solid ${BORDER}`, borderRadius: 6, background: selected ? "#e8f1fd" : "#fff", cursor: "pointer", fontSize: 14, color: selected ? NAVY : TEXT, fontWeight: selected ? 600 : 400, lineHeight: 1.45, transition: "all 0.15s", display: "flex", alignItems: "flex-start", gap: 12 }}
+                      onMouseEnter={e => { if (!selected) { e.currentTarget.style.borderColor = BLUE; e.currentTarget.style.background = "#f4f8ff"; }}}
+                      onMouseLeave={e => { if (!selected) { e.currentTarget.style.borderColor = BORDER; e.currentTarget.style.background = "#fff"; }}}
                     >
-                      <span style={{ flexShrink: 0, width: 22, height: 22, borderRadius: "50%", border: selected ? "2px solid #c0392b" : "2px solid #d1d5db", background: selected ? "#c0392b" : "transparent", display: "inline-flex", alignItems: "center", justifyContent: "center", marginTop: 1 }}>
-                        {selected && <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#fff", display: "block" }} />}
+                      <span style={{ flexShrink: 0, width: 20, height: 20, borderRadius: "50%", border: selected ? `2px solid ${BLUE}` : `2px solid ${BORDER}`, background: selected ? BLUE : "transparent", display: "inline-flex", alignItems: "center", justifyContent: "center", marginTop: 1 }}>
+                        {selected && <span style={{ width: 7, height: 7, borderRadius: "50%", background: "#fff", display: "block" }} />}
                       </span>
                       {opt.label}
                     </button>
@@ -369,16 +393,17 @@
               </div>
             </div>
           ))}
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", paddingTop: 24, paddingBottom: 48, borderTop: "1px solid #f3f4f6" }}>
+
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", paddingTop: 24, borderTop: `1px solid ${BORDER}` }}>
             {sectionIndex > 0 ? (
-              <button onClick={onBack} style={{ background: "transparent", border: "1px solid #e5e7eb", borderRadius: 6, padding: "12px 24px", fontSize: 14, color: "#6b7280", cursor: "pointer", fontFamily: "'DM Sans', sans-serif" }}>← Back</button>
+              <button onClick={onBack} style={{ background: "transparent", border: `1px solid ${BORDER}`, borderRadius: 6, padding: "11px 22px", fontSize: 14, color: MUTED, cursor: "pointer", fontWeight: 500 }}>← Back</button>
             ) : <div />}
             <button
               onClick={onNext}
               disabled={!allAnswered}
-              style={{ background: allAnswered ? "#1a1a2e" : "#e5e7eb", color: allAnswered ? "#fff" : "#9ca3af", border: "none", borderRadius: 6, padding: "12px 32px", fontSize: 15, fontWeight: 600, cursor: allAnswered ? "pointer" : "not-allowed", fontFamily: "'DM Sans', sans-serif", transition: "background 0.2s" }}
-              onMouseEnter={e => { if (allAnswered) e.target.style.background = "#c0392b"; }}
-              onMouseLeave={e => { if (allAnswered) e.target.style.background = "#1a1a2e"; }}
+              style={{ background: allAnswered ? BLUE : BORDER, color: allAnswered ? "#fff" : MUTED, border: "none", borderRadius: 6, padding: "12px 30px", fontSize: 15, fontWeight: 700, cursor: allAnswered ? "pointer" : "not-allowed", transition: "background 0.2s" }}
+              onMouseEnter={e => { if (allAnswered) e.target.style.background = BLUE_H; }}
+              onMouseLeave={e => { if (allAnswered) e.target.style.background = BLUE; }}
             >
               {sectionIndex === totalSections - 1 ? "See my results →" : "Next section →"}
             </button>
@@ -387,7 +412,8 @@
       );
     }
 
-    function ScoreGauge({ score, maxScore }) {
+    /* ── Score gauge ── */
+    function ScoreGauge({ score, maxScore, colour }) {
       const pct = (score / maxScore) * 100;
       const radius = 80;
       const circumference = Math.PI * radius;
@@ -395,38 +421,38 @@
       return (
         <div style={{ position: "relative", width: 200, height: 120, margin: "0 auto 8px" }}>
           <svg width="200" height="120" viewBox="0 0 200 120">
-            <path d="M 20 100 A 80 80 0 0 1 180 100" fill="none" stroke="#e5e7eb" strokeWidth="14" strokeLinecap="round" />
-            <path d="M 20 100 A 80 80 0 0 1 180 100" fill="none" stroke="#c0392b" strokeWidth="14" strokeLinecap="round" strokeDasharray={circumference} strokeDashoffset={dashOffset} style={{ transition: "stroke-dashoffset 1.5s ease" }} />
+            <path d="M 20 100 A 80 80 0 0 1 180 100" fill="none" stroke={BORDER} strokeWidth="14" strokeLinecap="round" />
+            <path d="M 20 100 A 80 80 0 0 1 180 100" fill="none" stroke={colour} strokeWidth="14" strokeLinecap="round" strokeDasharray={circumference} strokeDashoffset={dashOffset} style={{ transition: "stroke-dashoffset 1.5s ease" }} />
           </svg>
           <div style={{ position: "absolute", bottom: 4, left: "50%", transform: "translateX(-50%)", textAlign: "center" }}>
-            <div style={{ fontSize: 40, fontWeight: 800, color: "#1a1a2e", fontFamily: "'Playfair Display', Georgia, serif", lineHeight: 1 }}>{score}</div>
-            <div style={{ fontSize: 13, color: "#9ca3af", fontFamily: "'DM Mono', monospace" }}>out of {maxScore}</div>
+            <div style={{ fontSize: 42, fontWeight: 800, color: TEXT, lineHeight: 1 }}>{score}</div>
+            <div style={{ fontSize: 12, color: MUTED, fontWeight: 500 }}>out of {maxScore}</div>
           </div>
         </div>
       );
     }
 
+    /* ── Section breakdown ── */
     function SectionBreakdown({ sections, answers }) {
       return (
         <div style={{ marginTop: 40 }}>
-          <h3 style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: 22, fontWeight: 700, color: "#1a1a2e", marginBottom: 20 }}>Section breakdown</h3>
-          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+          <h3 style={{ fontSize: 18, fontWeight: 700, color: TEXT, marginBottom: 16 }}>Section breakdown</h3>
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             {sections.map(s => {
-              const maxSectionScore = s.questions.length * 4;
+              const maxSec = s.questions.length * 4;
               const sectionScore = s.questions.reduce((acc, q) => {
                 const optIdx = answers[q.id];
-                if (optIdx === undefined) return acc;
-                return acc + q.options[optIdx].score;
+                return optIdx === undefined ? acc : acc + q.options[optIdx].score;
               }, 0);
-              const pct = Math.round((sectionScore / maxSectionScore) * 100);
+              const pct = Math.round((sectionScore / maxSec) * 100);
               return (
-                <div key={s.id} style={{ padding: "14px 18px", border: "1px solid #e5e7eb", borderRadius: 8, background: "#fafafa" }}>
+                <div key={s.id} style={{ padding: "14px 16px", border: `1px solid ${BORDER}`, borderRadius: 6, background: "#fff" }}>
                   <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8, alignItems: "center" }}>
-                    <span style={{ fontSize: 14, color: "#374151", fontWeight: 600 }}>{s.icon} {s.title}</span>
-                    <span style={{ fontSize: 13, fontFamily: "'DM Mono', monospace", color: "#6b7280" }}>{sectionScore}/{maxSectionScore}</span>
+                    <span style={{ fontSize: 14, color: TEXT, fontWeight: 600 }}>{s.icon} {s.title}</span>
+                    <span style={{ fontSize: 13, color: MUTED, fontWeight: 500 }}>{sectionScore}/{maxSec}</span>
                   </div>
-                  <div style={{ height: 6, background: "#e5e7eb", borderRadius: 99 }}>
-                    <div style={{ height: "100%", width: `${pct}%`, background: pct >= 70 ? "#27ae60" : pct >= 45 ? "#f1c40f" : "#e74c3c", borderRadius: 99, transition: "width 1s ease" }} />
+                  <div style={{ height: 6, background: LIGHT, borderRadius: 99 }}>
+                    <div style={{ height: "100%", width: `${pct}%`, background: pct >= 70 ? "#27ae60" : pct >= 45 ? "#d4ac0d" : "#e74c3c", borderRadius: 99, transition: "width 1s ease" }} />
                   </div>
                 </div>
               );
@@ -436,6 +462,7 @@
       );
     }
 
+    /* ── AI Insight ── */
     function AIInsight({ score, maxScore, level, sections, answers }) {
       const [insight, setInsight] = useState("");
       const [loading, setLoading] = useState(true);
@@ -445,11 +472,9 @@
         const sectionSummary = sections.map(s => {
           const sectionScore = s.questions.reduce((acc, q) => {
             const optIdx = answers[q.id];
-            if (optIdx === undefined) return acc;
-            return acc + q.options[optIdx].score;
+            return optIdx === undefined ? acc : acc + q.options[optIdx].score;
           }, 0);
-          const maxSec = s.questions.length * 4;
-          return `${s.title}: ${sectionScore}/${maxSec}`;
+          return `${s.title}: ${sectionScore}/${s.questions.length * 4}`;
         }).join(", ");
 
         const prompt = `You are a pragmatic NZ business automation consultant writing a brief personalised insight for a law firm that just completed an automation assessment.\n\nAssessment result: ${level.label} (${score}/${maxScore}, ${pct}%)\nSection scores: ${sectionSummary}\n\nWrite 3–4 sentences of honest, specific, practical commentary. Identify their weakest area and name one concrete first step. Do NOT use generic AI hype language. Do NOT use bullet points. Write in plain direct NZ English. Do not start with "Based on your results" or "Congratulations". Be direct and useful. Mention specific practice areas by name.`;
@@ -457,16 +482,11 @@
         fetch("/.netlify/functions/claude", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            model: "claude-sonnet-4-20250514",
-            max_tokens: 1000,
-            messages: [{ role: "user", content: prompt }],
-          }),
+          body: JSON.stringify({ model: "claude-sonnet-4-20250514", max_tokens: 1000, messages: [{ role: "user", content: prompt }] }),
         })
           .then(r => r.json())
           .then(data => {
-            const text = data.content?.find(b => b.type === "text")?.text || "";
-            setInsight(text);
+            setInsight(data.content?.find(b => b.type === "text")?.text || "");
             setLoading(false);
           })
           .catch(() => {
@@ -476,63 +496,78 @@
       }, []);
 
       return (
-        <div style={{ background: "#1a1a2e", borderRadius: 10, padding: "28px 28px", marginTop: 32, position: "relative", overflow: "hidden" }}>
-          <div style={{ position: "absolute", top: -20, right: -20, fontSize: 80, opacity: 0.05 }}>🧠</div>
-          <div style={{ fontSize: 11, fontFamily: "'DM Mono', monospace", letterSpacing: "0.1em", color: "#9ca3af", textTransform: "uppercase", marginBottom: 12 }}>AI-generated insight</div>
+        <div style={{ background: NAVY, borderRadius: 8, padding: "28px", marginTop: 32 }}>
+          <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", color: "#7aadd4", textTransform: "uppercase", marginBottom: 12 }}>AI-generated insight</div>
           {loading ? (
             <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
               {[0, 1, 2].map(i => (
-                <div key={i} style={{ width: 8, height: 8, borderRadius: "50%", background: "#c0392b", animation: "pulse 1.2s ease-in-out infinite", animationDelay: `${i * 0.2}s` }} />
+                <div key={i} style={{ width: 8, height: 8, borderRadius: "50%", background: BLUE, animation: "pulse 1.2s ease-in-out infinite", animationDelay: `${i * 0.2}s` }} />
               ))}
               <style>{"@keyframes pulse { 0%,100%{opacity:0.3} 50%{opacity:1} }"}</style>
             </div>
           ) : (
-            <p style={{ fontSize: 16, color: "#e5e7eb", lineHeight: 1.7, fontFamily: "'DM Sans', sans-serif" }}>{insight}</p>
+            <p style={{ fontSize: 16, color: "#e0eaf5", lineHeight: 1.75 }}>{insight}</p>
           )}
         </div>
       );
     }
 
+    /* ── Results screen ── */
     function Results({ score, maxScore, sections, answers, onRestart }) {
       const level = getMaturityLevel(score, maxScore);
       return (
-        <div style={{ maxWidth: 680, margin: "0 auto", padding: "0 24px 64px" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 40, paddingTop: 32 }}>
-            <span style={{ fontSize: 20 }}>🧺</span>
-            <span style={{ fontFamily: "'Playfair Display', Georgia, serif", fontWeight: 700, fontSize: 18, color: "#1a1a2e" }}>HardBasket</span>
-          </div>
-          <div style={{ border: `3px solid ${level.colour}`, borderRadius: 12, padding: "36px 32px", marginBottom: 32, textAlign: "center", background: "#fff" }}>
-            <div style={{ fontSize: 11, fontFamily: "'DM Mono', monospace", letterSpacing: "0.1em", textTransform: "uppercase", color: "#6b7280", marginBottom: 16 }}>Your result</div>
-            <ScoreGauge score={score} maxScore={maxScore} />
-            <div style={{ display: "inline-block", padding: "8px 20px", borderRadius: 99, background: level.colour, color: "#fff", fontWeight: 700, fontSize: 18, fontFamily: "'DM Sans', sans-serif", margin: "16px 0 10px" }}>{level.label}</div>
-            <p style={{ fontSize: 18, color: "#374151", fontStyle: "italic", fontFamily: "'Playfair Display', Georgia, serif" }}>&#8220;{level.tagline}&#8221;</p>
-          </div>
-          <div style={{ marginBottom: 32 }}>
-            <p style={{ fontSize: 16, color: "#4b5563", lineHeight: 1.75, fontFamily: "'DM Sans', sans-serif" }}>{level.description}</p>
-          </div>
-          <div style={{ background: "#f9fafb", border: "1px solid #e5e7eb", borderRadius: 10, padding: "24px 24px", marginBottom: 8 }}>
-            <h3 style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: 20, fontWeight: 700, color: "#1a1a2e", marginBottom: 16 }}>Where to focus next</h3>
-            {level.priorities.map((p, i) => (
-              <div key={i} style={{ display: "flex", gap: 12, alignItems: "flex-start", marginBottom: 14, paddingBottom: 14, borderBottom: i < level.priorities.length - 1 ? "1px solid #e5e7eb" : "none" }}>
-                <span style={{ flexShrink: 0, width: 24, height: 24, borderRadius: 4, background: "#c0392b", color: "#fff", display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 700, fontFamily: "'DM Mono', monospace" }}>{i + 1}</span>
-                <span style={{ fontSize: 15, color: "#374151", lineHeight: 1.5, fontFamily: "'DM Sans', sans-serif" }}>{p}</span>
+        <div>
+          <div style={{ maxWidth: 680, margin: "0 auto", padding: "40px 24px 64px" }}>
+            {/* Score card */}
+            <div style={{ border: `3px solid ${level.colour}`, borderRadius: 10, padding: "36px 28px", marginBottom: 28, textAlign: "center", background: "#fff" }}>
+              <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: MUTED, marginBottom: 16 }}>Your result</div>
+              <ScoreGauge score={score} maxScore={maxScore} colour={level.colour} />
+              <div style={{ display: "inline-block", padding: "8px 22px", borderRadius: 99, background: level.colour, color: "#fff", fontWeight: 700, fontSize: 17, margin: "16px 0 10px" }}>
+                {level.label}
               </div>
-            ))}
-          </div>
-          <AIInsight score={score} maxScore={maxScore} level={level} sections={sections} answers={answers} />
-          <SectionBreakdown sections={sections} answers={answers} />
-          <div style={{ marginTop: 48, background: "#1a1a2e", borderRadius: 12, padding: "36px 32px", textAlign: "center" }}>
-            <h3 style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: 26, fontWeight: 700, color: "#fff", marginBottom: 12 }}>Want to know exactly what to fix first?</h3>
-            <p style={{ fontSize: 16, color: "#9ca3af", lineHeight: 1.6, marginBottom: 28 }}>HardBasket does a free 30-minute systems review for NZ law firms. We'll map your current tools, identify the three highest-value automation opportunities, and give you a plain-English plan — no pressure, no pitch deck.</p>
-            <a href="https://hardbasket.com" target="_blank" rel="noopener noreferrer" style={{ display: "inline-block", background: "#c0392b", color: "#fff", borderRadius: 6, padding: "14px 36px", fontSize: 15, fontWeight: 700, textDecoration: "none", fontFamily: "'DM Sans', sans-serif", letterSpacing: "-0.01em" }}>Book a free systems review →</a>
-            <div style={{ marginTop: 20 }}>
-              <button onClick={onRestart} style={{ background: "transparent", border: "none", color: "#6b7280", cursor: "pointer", fontSize: 13, fontFamily: "'DM Sans', sans-serif", textDecoration: "underline" }}>Retake assessment</button>
+              <p style={{ fontSize: 17, color: MUTED, fontStyle: "italic", lineHeight: 1.5 }}>&#8220;{level.tagline}&#8221;</p>
+            </div>
+
+            {/* Description */}
+            <p style={{ fontSize: 16, color: TEXT, lineHeight: 1.75, marginBottom: 28 }}>{level.description}</p>
+
+            {/* Priorities */}
+            <div style={{ background: LIGHT, border: `1px solid ${BORDER}`, borderRadius: 8, padding: "24px", marginBottom: 8 }}>
+              <h3 style={{ fontSize: 18, fontWeight: 700, color: TEXT, marginBottom: 16 }}>Where to focus next</h3>
+              {level.priorities.map((p, i) => (
+                <div key={i} style={{ display: "flex", gap: 12, alignItems: "flex-start", marginBottom: 14, paddingBottom: 14, borderBottom: i < level.priorities.length - 1 ? `1px solid ${BORDER}` : "none" }}>
+                  <span style={{ flexShrink: 0, width: 24, height: 24, borderRadius: 4, background: BLUE, color: "#fff", display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 700 }}>{i + 1}</span>
+                  <span style={{ fontSize: 14, color: TEXT, lineHeight: 1.55 }}>{p}</span>
+                </div>
+              ))}
+            </div>
+
+            {/* AI insight */}
+            <AIInsight score={score} maxScore={maxScore} level={level} sections={sections} answers={answers} />
+
+            {/* Section breakdown */}
+            <SectionBreakdown sections={sections} answers={answers} />
+
+            {/* CTA */}
+            <div style={{ marginTop: 48, background: NAVY, borderRadius: 10, padding: "40px 32px", textAlign: "center" }}>
+              <h3 style={{ fontSize: 24, fontWeight: 800, color: "#fff", marginBottom: 12, letterSpacing: "-0.02em" }}>Want to know exactly what to fix first?</h3>
+              <p style={{ fontSize: 16, color: "#a8c8f0", lineHeight: 1.65, marginBottom: 28, maxWidth: 480, margin: "0 auto 28px" }}>
+                HardBasket does a free 30-minute systems review for NZ law firms. We'll map your current tools, identify the three highest-value automation opportunities, and give you a plain-English plan.
+              </p>
+              <a href="https://hardbasket.com" target="_blank" rel="noopener noreferrer"
+                style={{ display: "inline-block", background: BLUE, color: "#fff", borderRadius: 6, padding: "14px 36px", fontSize: 15, fontWeight: 700, textDecoration: "none", letterSpacing: "-0.01em" }}>
+                Book a free systems review →
+              </a>
+              <div style={{ marginTop: 20 }}>
+                <button onClick={onRestart} style={{ background: "transparent", border: "none", color: "#7aadd4", cursor: "pointer", fontSize: 13, textDecoration: "underline" }}>Retake assessment</button>
+              </div>
             </div>
           </div>
         </div>
       );
     }
 
+    /* ── App ── */
     function App() {
       const [stage, setStage] = useState("intro");
       const [currentSection, setCurrentSection] = useState(0);
@@ -541,45 +576,46 @@
       const topRef = useRef(null);
 
       const scrollTop = () => { if (topRef.current) topRef.current.scrollIntoView({ behavior: "smooth" }); };
-
       const handleAnswer = (qId, optIdx, score) => {
         setAnswers(prev => ({ ...prev, [qId]: optIdx }));
         setScores(prev => ({ ...prev, [qId]: score }));
       };
-
       const handleNext = () => {
         scrollTop();
         if (currentSection < SECTIONS.length - 1) { setCurrentSection(c => c + 1); } else { setStage("results"); }
       };
-
       const handleBack = () => { scrollTop(); setCurrentSection(c => c - 1); };
-
       const handleRestart = () => { setAnswers({}); setScores({}); setCurrentSection(0); setStage("intro"); scrollTop(); };
-
       const totalScore = Object.values(scores).reduce((a, b) => a + b, 0);
       const maxScore = SECTIONS.reduce((acc, s) => acc + s.questions.length * 4, 0);
 
       return (
-        <div ref={topRef} style={{ minHeight: "100vh", background: "#ffffff", fontFamily: "'DM Sans', sans-serif" }}>
-          <style>{`@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@400;600;700&family=DM+Mono:wght@400;600&display=swap'); * { box-sizing: border-box; margin: 0; padding: 0; } button { font-family: inherit; }`}</style>
-          <div style={{ height: 4, background: "linear-gradient(90deg, #c0392b, #e74c3c, #f39c12)" }} />
+        <div ref={topRef} style={{ minHeight: "100vh", background: LIGHT }}>
+          <Header />
           {stage === "intro" && <Intro onStart={() => { setStage("question"); scrollTop(); }} />}
           {stage === "question" && (
-            <div style={{ paddingTop: 40 }}>
-              <QuestionSection section={SECTIONS[currentSection]} sectionIndex={currentSection} totalSections={SECTIONS.length} answers={answers} onAnswer={handleAnswer} onNext={handleNext} onBack={handleBack} />
+            <div style={{ background: "#fff", minHeight: "80vh" }}>
+              <QuestionSection
+                section={SECTIONS[currentSection]}
+                sectionIndex={currentSection}
+                totalSections={SECTIONS.length}
+                answers={answers}
+                onAnswer={handleAnswer}
+                onNext={handleNext}
+                onBack={handleBack}
+              />
             </div>
           )}
-          {stage === "results" && <Results score={totalScore} maxScore={maxScore} sections={SECTIONS} answers={answers} onRestart={handleRestart} />}
-          <div style={{ borderTop: "1px solid #f3f4f6", padding: "20px 24px", textAlign: "center", fontSize: 13, color: "#9ca3af", fontFamily: "'DM Mono', monospace" }}>
-            <a href="https://hardbasket.com" target="_blank" rel="noopener noreferrer" style={{ color: "#9ca3af", textDecoration: "none" }}>hardbasket.com</a>
-            {" · "}Built for NZ law firms
+          {stage === "results" && <div style={{ background: LIGHT }}><Results score={totalScore} maxScore={maxScore} sections={SECTIONS} answers={answers} onRestart={handleRestart} /></div>}
+          <div style={{ background: NAVY, padding: "20px 24px", textAlign: "center", fontSize: 13, color: "#7aadd4" }}>
+            <a href="https://hardbasket.com" target="_blank" rel="noopener noreferrer" style={{ color: "#7aadd4", textDecoration: "none" }}>hardbasket.com</a>
+            {" · "}System &amp; Process Improvement for NZ Businesses
           </div>
         </div>
       );
     }
 
-    const root = ReactDOM.createRoot(document.getElementById("root"));
-    root.render(<App />);
+    ReactDOM.createRoot(document.getElementById("root")).render(<App />);
   </script>
 </body>
 </html>
